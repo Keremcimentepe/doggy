@@ -1,5 +1,6 @@
 // Turn Vitest JSON results and installed package versions into GitHub annotations.
 // Run from the web/ directory.
+import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
 const escape = (text) => text.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
@@ -32,4 +33,11 @@ const versions = names
   })
   .join(', ');
 console.log(`::notice title=npm resolved::${versions}`);
-console.log(`::notice title=npm lockfile::${existsSync('package-lock.json') ? 'present' : 'missing'}`);
+// npm install creates a lockfile in CI, so ask git whether one is actually committed.
+let lockCommitted = true;
+try {
+  execSync('git ls-files --error-unmatch package-lock.json', { stdio: 'ignore' });
+} catch {
+  lockCommitted = false;
+}
+console.log(`::notice title=npm lockfile::${lockCommitted ? 'committed' : 'not committed'}`);

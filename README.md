@@ -65,10 +65,14 @@ If private videos are added later, Caddy's `forward_auth` can ask the API before
 
 ## Status
 
+Results come from GitHub Actions; local and server checks are added as they are run.
+
 | Check | Result |
 |---|---|
-| API build + xUnit | Not yet run |
-| Web typecheck + Vitest + build | Not yet run |
+| API build + xUnit | Passed in CI (1/1 tests) |
+| Web typecheck + Vitest + build | Passed in CI (2/2 tests) |
+| Runs on a developer machine | Not yet checked |
+| Deployed to the server | Not yet |
 
 ## Local development
 
