@@ -17,14 +17,19 @@ jobs:
     name: API (build + xUnit)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
-      - run: dotnet --info
       - run: dotnet restore Doggy.slnx
       - run: dotnet build Doggy.slnx --no-restore -c Release
-      - run: dotnet test Doggy.slnx --no-build -c Release
+      - run: dotnet test Doggy.slnx --no-build -c Release --logger trx --results-directory TestResults
+      - name: Annotate test results
+        if: always()
+        run: python3 .github/scripts/trx_summary.py TestResults
+      - name: Annotate resolved packages
+        if: always()
+        run: dotnet list Doggy.slnx package --format json | python3 .github/scripts/nuget_summary.py
 
   web:
     name: Web (typecheck + Vitest + build)
@@ -33,8 +38,8 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       # TEMPORARY: until package-lock.json is committed (generated on a dev machine), fall back to npm install.
@@ -42,5 +47,8 @@ jobs:
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
       - run: npm run typecheck
-      - run: npm test
+      - run: npm test -- --reporter=default --reporter=json --outputFile.json=vitest-results.json
       - run: npm run build
+      - name: Annotate test results and versions
+        if: always()
+        run: node ../.github/scripts/web_summary.mjs
