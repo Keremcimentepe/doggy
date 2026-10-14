@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Doggy.Api/Doggy.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Doggy.Api.Tests/Doggy.Api.Tests.csproj" />
+  </Folder>
+</Solution>
